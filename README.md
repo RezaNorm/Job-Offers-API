@@ -12,8 +12,8 @@ Ensure you have the following installed:
 
 ### **2. Clone the Repository**
 ```sh
-git clone https://github.com/your-repository/nestjs-job-offers.git
-cd nestjs-job-offers
+git clone https://github.com/RezaNorm/Job-Offers-API.git
+cd Job-Offers-API
 ```
 
 ### **3. Install Dependencies**
@@ -24,28 +24,23 @@ npm install
 ### **4. Set Up Environment Variables**
 Create a `.env` file in the project root and configure your database connection:
 ```env
-DATABASE_URL=postgresql://user:password@localhost:5432/job_offers
+DATABASE_URL="prisma+postgres://accelerate.prisma-data.net/?api_key=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcGlfa2V5IjoiMjc4MTVmNDQtODA0OC00NTJhLTljMmEtYzBjM2E0ZGYxZGUxIiwidGVuYW50X2lkIjoiMDVmYzFhZmNmYjFiYjBlYTZiYWYwMzNiOWI0YWEzYTkzMmYyODkwNzY3MjlmNjBhNTEyYzBjMDlhOGNhODMzNSIsImludGVybmFsX3NlY3JldCI6Ijc2ZDVhNzQ1LTUyNjktNGZhOC04NDZkLTdlZTVkNjQ0MTY1YSJ9.5WUKco5MyhkM8KR4y6NrdUFynqivRGY7fWFwlDgEiYY"
 PORT=3000
 CRON_EXPRESSION=* * * * * # Runs every minute
 ```
 
-### **5. Start the Database** (If using Docker)
-```sh
-docker-compose up -d
-```
-
-### **6. Apply Database Migrations**
+### **5. Apply Database Migrations**
 ```sh
 npx prisma migrate dev --name init
 ```
 
-### **7. Start the Application**
+### **6. Start the Application**
 ```sh
 npm run start
 ```
 The API will be available at: **[http://localhost:3000](http://localhost:3000)**
 
-### **8. Open API Documentation (Swagger)**
+### **7. Open API Documentation (Swagger)**
 ```sh
 http://localhost:3000/api/docs
 ```
@@ -55,6 +50,7 @@ http://localhost:3000/api/docs
 ### **Unit & Integration Tests**
 ```sh
 npm run test
+npm run test:e2e
 ```
 
 ### **Watch Mode (Auto-rerun on changes)**
