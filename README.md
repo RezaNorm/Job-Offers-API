@@ -8,7 +8,6 @@ This is a **NestJS** backend application that fetches job offers from multiple A
 Ensure you have the following installed:
 - **Node.js** (v16 or later)
 - **npm** or **yarn**
-- **Docker** (for PostgreSQL database, optional but recommended)
 
 ### **2. Clone the Repository**
 ```sh
