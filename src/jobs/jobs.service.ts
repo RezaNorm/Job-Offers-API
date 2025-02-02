@@ -59,6 +59,10 @@ export class JobsService {
         take: limit,
         skip: (page - 1) * limit,
         orderBy: { datePosted: 'desc' },
+        include: {
+          company: { select: { name: true } },
+          skills: { select: { requirement: { select: { skill: true } } } },
+        },
       });
 
       const total = await this.prisma.job.count({ where: whereCondition });

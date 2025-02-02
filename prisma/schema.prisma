@@ -21,9 +21,10 @@ model Job {
   currency   String?  @default("USD")
   datePosted DateTime
 
-  companyId       String?
-  company         Company?         @relation(fields: [companyId], references: [id])
-  jobRequirements JobRequirement[]
+  companyId String?
+  company   Company? @relation(fields: [companyId], references: [id])
+  
+  skills JobRequirementOnJob[]
 }
 
 model Company {
@@ -37,7 +38,16 @@ model Company {
 
 model JobRequirement {
   id    String @id @default(uuid())
-  jobId String @unique
-  job   Job    @relation(fields: [jobId], references: [id])
-  skills String[]
+  skill String @unique
+
+  jobs JobRequirementOnJob[]
+}
+
+model JobRequirementOnJob {
+  jobId             String
+  requirementId     String
+  job              Job             @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  requirement      JobRequirement  @relation(fields: [requirementId], references: [id], onDelete: Cascade)
+
+  @@id([jobId, requirementId])
 }

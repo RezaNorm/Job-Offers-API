@@ -1,4 +1,8 @@
-import { Injectable, Logger, InternalServerErrorException } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { JobApi1Response } from '../interface/jobApi1Response.interface';
 import { JobApi2Response } from '../interface/jobApi2Response.interface';
@@ -12,7 +16,9 @@ export class JobTransformerService {
   async transformApi1Data(data: JobApi1Response): Promise<void> {
     try {
       for (const job of data.jobs) {
-        const [city, state] = job.details.location.split(',').map((s) => s.trim());
+        const [city, state] = job.details.location
+          .split(',')
+          .map((s) => s.trim());
         const [minSalary, maxSalary] = job.details.salaryRange
           .replace(/\$|k/g, '')
           .split(' - ')
@@ -26,7 +32,14 @@ export class JobTransformerService {
 
         const createdJob = await this.prisma.job.upsert({
           where: { externalId: job.jobId },
-          update: { title: job.title, type: job.details.type, city, state, minSalary, maxSalary },
+          update: {
+            title: job.title,
+            type: job.details.type,
+            city,
+            state,
+            minSalary,
+            maxSalary,
+          },
           create: {
             externalId: job.jobId,
             title: job.title,
@@ -40,11 +53,20 @@ export class JobTransformerService {
           },
         });
 
-        await this.prisma.jobRequirement.upsert({
-          where: { jobId: createdJob.id },
-          update: { skills: job.skills },
-          create: { jobId: createdJob.id, skills: job.skills },
-        });
+        for (const skill of job.skills) {
+          const requirement = await this.prisma.jobRequirement.upsert({
+            where: { skill },
+            update: {},
+            create: { skill },
+          });
+
+          await this.prisma.jobRequirementOnJob.create({
+            data: {
+              requirementId: requirement.id,
+              jobId: createdJob.id,
+            },
+          });
+        }
       }
     } catch (error) {
       this.logger.error(`transformApi1Data failed: ${error}`);
@@ -60,12 +82,19 @@ export class JobTransformerService {
         const company = await this.prisma.company.upsert({
           where: { name: job.employer.companyName },
           update: { website: job.employer.website },
-          create: { name: job.employer.companyName, website: job.employer.website },
+          create: {
+            name: job.employer.companyName,
+            website: job.employer.website,
+          },
         });
 
         const createdJob = await this.prisma.job.upsert({
           where: { externalId: key },
-          update: { title: job.position, city: job.location.city, minSalary: job.compensation.min },
+          update: {
+            title: job.position,
+            city: job.location.city,
+            minSalary: job.compensation.min,
+          },
           create: {
             externalId: key,
             title: job.position,
@@ -78,11 +107,20 @@ export class JobTransformerService {
           },
         });
 
-        await this.prisma.jobRequirement.upsert({
-          where: { jobId: createdJob.id },
-          update: { skills: job.requirements.technologies },
-          create: { jobId: createdJob.id, skills: job.requirements.technologies },
-        });
+        for (const skill of job.requirements.technologies) {
+          const requirement = await this.prisma.jobRequirement.upsert({
+            where: { skill },
+            update: {},
+            create: { skill },
+          });
+
+          await this.prisma.jobRequirementOnJob.create({
+            data: {
+              requirementId: requirement.id,
+              jobId: createdJob.id,
+            },
+          });
+        }
       }
     } catch (error) {
       this.logger.error(`transformApi2Data failed: ${error}`);
